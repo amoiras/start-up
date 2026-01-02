@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>In-game Trading Infrastructure — Player-to-Player, Compliance-Ready</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <meta name="description"
+    content="Infrastructure for game studios to enable player-to-player trading of in-game assets and currencies for fiat or crypto, with optional NFT minting. Free for studios to implement; studios earn a cut when players trade." />
+  <meta property="og:title" content="Game Trading Infrastructure" />
+  <meta property="og:description"
+    content="Enable player-to-player trading in your game. Free to implement. Studios earn a cut per transaction. Compliance workflows included." />
+
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: rgba(255, 255, 255, .06);
+      --card2: rgba(255, 255, 255, .10);
+      --text: rgba(255, 255, 255, .92);
+      --muted: rgba(255, 255, 255, .70);
+      --border: rgba(255, 255, 255, .14);
+      --shadow: 0 24px 60px rgba(0, 0, 0, .35);
+    }
+
+    body {
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(99, 102, 241, .22), transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, rgba(34, 197, 94, .18), transparent 55%),
+        radial-gradient(900px 500px at 40% 95%, rgba(56, 189, 248, .14), transparent 55%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .nav-blur {
+      backdrop-filter: blur(10px);
+      background: rgba(11, 18, 32, .65);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero {
+      padding-top: 6.5rem;
+      padding-bottom: 4rem;
+    }
+
+    .badge-soft {
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .glass {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .glass-2 {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .icon-pill {
+      width: 44px;
+      height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .10);
+      border: 1px solid var(--border);
+    }
+
+    .btn-primary {
+      background: #6366f1;
+      border-color: #6366f1;
+      box-shadow: 0 16px 30px rgba(99, 102, 241, .25);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+    }
+
+    .btn-outline-light {
+      border-color: rgba(255, 255, 255, .28);
+      color: var(--text);
+    }
+
+    .btn-outline-light:hover {
+      background: rgba(255, 255, 255, .10);
+      border-color: rgba(255, 255, 255, .40);
+      color: var(--text);
+    }
+
+    .section {
+      padding: 4rem 0;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(255, 255, 255, .18), transparent);
+    }
+
+    .feature {
+      height: 100%;
+      padding: 1.25rem;
+    }
+
+    .pricing-card {
+      padding: 1.75rem;
+    }
+
+    .mini {
+      font-size: .92rem;
+    }
+
+    .form-control,
+    .form-select {
+      background: rgba(255, 255, 255, .08);
+      border-color: rgba(255, 255, 255, .18);
+      color: var(--text);
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, .55);
+    }
+
+    .form-control:focus {
+      background: rgba(255, 255, 255, .10);
+      border-color: rgba(99, 102, 241, .6);
+      box-shadow: 0 0 0 .25rem rgba(99, 102, 241, .18);
+      color: var(--text);
+    }
+
+    .link-muted {
+      color: rgba(255, 255, 255, .70);
+      text-decoration: none;
+    }
+
+    .link-muted:hover {
+      color: rgba(255, 255, 255, .92);
+      text-decoration: underline;
+    }
+
+    .iframe-wrap {
+      overflow: hidden;
+      border-radius: 1.25rem;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .04);
+    }
+
+    .trust-chip {
+      display: inline-flex;
+      gap: .5rem;
+      align-items: center;
+      padding: .5rem .75rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .kicker {
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      font-size: .82rem;
+      color: rgba(255, 255, 255, .72);
+    }
+
+    .ul-clean {
+      padding-left: 1.1rem;
+      margin-bottom: 0;
+    }
+
+    .ul-clean li {
+      margin-bottom: .35rem;
+    }
+
+    .input-group-text {
+      background: rgba(255, 255, 255, .08);
+      border-color: rgba(255, 255, 255, .18);
+      color: rgba(255, 255, 255, .75);
+    }
+
+    /* Fix select dropdown contrast (dark background + light text) */
+    .form-select {
+      background-color: rgba(0, 0, 0, .55) !important;
+      color: rgba(255, 255, 255, .92) !important;
+    }
+
+    .form-select option {
+      background-color: #0b1220;
+      color: rgba(255, 255, 255, .92);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAV -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top nav-blur">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="#">
+        <i class="bi bi-controller me-2"></i>In-game Trading Infrastructure
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="#how">How it works</a></li>
+          <li class="nav-item"><a class="nav-link" href="#players">Players can</a></li>
+          <li class="nav-item"><a class="nav-link" href="#market">Official market</a></li>
+          <li class="nav-item"><a class="nav-link" href="#fees">Fees</a></li>
+          <li class="nav-item"><a class="nav-link" href="#feedback">Survey</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item ms-lg-2">
+            <a class="btn btn-primary btn-sm px-3" href="#waitlist">Join waitlist</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <div class="kicker mb-2">B2B infrastructure for game studios</div>
+
+          <span class="badge badge-soft rounded-pill px-3 py-2 mb-3">
+            <i class="bi bi-arrow-left-right me-1"></i> Player-to-player trading with compliance workflows
+          </span>
+
+          <h1 class="display-5 fw-bold lh-sm">
+            Enable <span style="color:#a5b4fc;">player-to-player</span> trading of in-game assets for real money —
+            <span style="color:#a5b4fc;">free for studios</span> to implement.
+          </h1>
+
+          <p class="lead muted mt-3">
+            Studios pay nothing to add this. If players don't use it, the studio loses nothing.
+            When players trade, the studio earns a configurable cut per transaction (0%+), and the platform earns a fee.
+          </p>
+
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            <a class="btn btn-primary btn-lg px-4" href="#waitlist">
+              Join the waitlist <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+            <a class="btn btn-outline-light btn-lg px-4" href="#feedback">
+              Take the survey <i class="bi bi-chat-dots ms-2"></i>
+            </a>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            <span class="trust-chip"><i class="bi bi-person-check"></i> KYC / KYB</span>
+            <span class="trust-chip"><i class="bi bi-person-vcard"></i> Age verification</span>
+            <span class="trust-chip"><i class="bi bi-shield-lock"></i> AML screening</span>
+            <span class="trust-chip"><i class="bi bi-receipt"></i> Legal & tax handling</span>
+            <span class="trust-chip"><i class="bi bi-currency-bitcoin"></i> Fiat + crypto support</span>
+            <span class="trust-chip"><i class="bi bi-shield-check"></i> GDPR compliance</span>
+            <span class="trust-chip"><i class="bi bi-shield-exclamation"></i> Reduce scams & stolen accounts</span>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="glass p-4">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="icon-pill"><i class="bi bi-shield-check"></i></div>
+              <div>
+                <div class="fw-semibold">No studio downside</div>
+                <div class="muted mini">Free implementation, revenue-share upside</div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12">
+                <div class="glass-2 p-3">
+                  <div class="fw-semibold">€0 to implement</div>
+                  <div class="muted mini mt-1">No subscription, no setup cost for the studio.</div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="glass-2 p-3">
+                  <div class="fw-semibold">Player-to-player trading</div>
+                  <div class="muted mini mt-1">Players trade with each other when they want. The studio is not the
+                    counterparty.</div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="glass-2 p-3">
+                  <div class="fw-semibold">Studio controls the cut</div>
+                  <div class="muted mini mt-1">Set 0%+ per transaction. Change it anytime.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider my-4"></div>
+            <div class="muted mini">
+              Join the waitlist if you want updates.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="section">
+    <div class="container">
+      <div class="row mb-4 align-items-end">
+        <div class="col-lg-8">
+          <h2 class="fw-bold">How it works</h2>
+          <p class="muted mb-0">
+            A plug-in / SDK layer that enables compliant player-to-player trading, while keeping studios in control of
+            fees and rules.
+          </p>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="glass feature">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div class="icon-pill"><i class="bi bi-plug"></i></div>
+              <div class="fw-semibold">1) Integrate</div>
+            </div>
+            <p class="muted mini mb-0">
+              Integrate the SDK/API and define what can be traded (in-game currencies and/or assets).
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="glass feature">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div class="icon-pill"><i class="bi bi-shield-check"></i></div>
+              <div class="fw-semibold">2) Verification & compliance</div>
+            </div>
+            <p class="muted mini mb-0">
+              Identity verification (KYC/KYB), <strong>age verification</strong>, and <strong>AML (anti-money
+                laundering)</strong>
+              screening are built into the transaction flow, together with legal/tax handling.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="glass feature">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div class="icon-pill"><i class="bi bi-arrow-left-right"></i></div>
+              <div class="fw-semibold">3) Players trade</div>
+            </div>
+            <p class="muted mini mb-0">
+              Players trade with each other when they want. The studio earns a cut per transaction, with no operational
+              burden.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAYERS CAN -->
+  <section id="players" class="section pt-0">
+    <div class="container">
+      <div class="glass p-4 p-lg-5">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-6">
+            <h2 class="fw-bold mb-3">Players can</h2>
+            <p class="muted mb-0">
+              Trading is optional and player-initiated. The studio does not buy or sell; it only earns a cut from
+              completed trades.
+            </p>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="glass-2 p-4">
+              <ul class="ul-clean muted">
+                <li><strong>Trade in-game assets</strong> with other players.</li>
+                <li><strong>Trade in-game currencies</strong> with other players.</li>
+                <li><strong>Pay/receive fiat or crypto</strong> (depending on studio settings and requirements).</li>
+                <li><strong>Optional: Convert specific in-game assets into NFTs</strong> (Non-Fungible Tokens) and trade
+                  them.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider my-4"></div>
+
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="glass-2 p-3 h-100">
+              <div class="fw-semibold">Player-to-player by design</div>
+              <div class="muted mini mt-1">Players exchange with each other. The studio is not the counterparty.</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="glass-2 p-3 h-100">
+              <div class="fw-semibold">Studio earns automatically</div>
+              <div class="muted mini mt-1">A studio-defined cut is taken on each successful trade.</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="glass-2 p-3 h-100">
+              <div class="fw-semibold">Compliance included</div>
+              <div class="muted mini mt-1">Verification and monitoring are part of the trade flow.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- OFFICIAL MARKET -->
+  <section id="market" class="section pt-0">
+    <div class="container">
+      <div class="glass p-4 p-lg-5">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-6">
+            <h2 class="fw-bold mb-2">Make trading official and trackable</h2>
+            <p class="muted mb-0">
+              Unofficial player-to-player markets already exist in many games. This makes activity difficult to monitor
+              and often pushes it off-platform.
+              We bring it into an official flow that can be tracked.
+            </p>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="glass-2 p-4">
+              <ul class="ul-clean muted">
+                <li><strong>Replace grey markets:</strong> move activity on-platform instead of off-site.</li>
+                <li><strong>Increase visibility:</strong> track transactions and fee revenue.</li>
+                <li><strong>Reduce scams and fraud:</strong> verified identities lower impersonation and
+                  social-engineering attacks.</li>
+                <li><strong>Limit chargebacks:</strong> structured flows and verification reduce payment disputes.</li>
+                <li><strong>Protect player accounts:</strong> fewer incentives for account theft and resale.</li>
+                <li><strong>Keep studio control:</strong> studios define what is tradable and under what rules.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEES -->
+  <section id="fees" class="section pt-0">
+    <div class="container">
+      <div class="row mb-4 align-items-end">
+        <div class="col-lg-8">
+          <h2 class="fw-bold">Fees</h2>
+          <p class="muted mb-0">Studios pay nothing to implement. Fees only apply when players trade.</p>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <div class="glass pricing-card h-100">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div class="icon-pill"><i class="bi bi-building-check"></i></div>
+              <div>
+                <div class="fw-semibold fs-5">Studio earns Flat Fee</div>
+                <div class="muted mini">Set by the studio</div>
+              </div>
+            </div>
+            <div class="display-6 fw-bold mt-2">x%</div>
+            <p class="muted mt-2 mb-3">
+              Each studio chooses its cut per transaction. If no trades happen, there are no fees and no costs.
+            </p>
+            <ul class="muted mini mb-0">
+              <li>€0 to implement</li>
+              <li>Profit only when used</li>
+              <li>Studio remains in control</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="glass pricing-card h-100">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div class="icon-pill"><i class="bi bi-pie-chart"></i></div>
+              <div>
+                <div class="fw-semibold fs-5">Platform fee</div>
+                <div class="muted mini">Taken per transaction</div>
+              </div>
+            </div>
+            <div class="display-6 fw-bold mt-2">1-3%</div>
+            <p class="muted mt-2 mb-3">
+              The platform fee is taken only on completed trades.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- WAITLIST -->
+  <section id="waitlist" class="section">
+    <div class="container">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-6">
+          <h2 class="fw-bold">Waitlist</h2>
+          <p class="muted mb-0">
+            Leave your email to receive updates about this product.
+          </p>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="glass p-4">
+            <form id="waitlistForm"
+              action="https://script.google.com/macros/s/AKfycbyUmrZfvXv3-4OhfDpqkE9BOkKVvftQ2f4GxagEYdj4j7hEky7Ro-z-uMEFDdJxGCov/exec"
+              method="POST" target="waitlist_iframe" class="row g-2">
+
+              <input type="hidden" name="type" value="waitlist">
+              <input type="hidden" name="secret" value="change-this-to-something-long">
+
+              <div class="col-12">
+                <label class="form-label mini muted" for="email">Email</label>
+                <input class="form-control form-control-lg" type="email" id="email" name="email"
+                  placeholder="you@studio.com" required />
+              </div>
+
+              <div class="col-12">
+                <label class="form-label mini muted" for="studio">Studio / Company (optional)</label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text"><i class="bi bi-building"></i></span>
+                  <input class="form-control" type="text" id="studio" name="studio" placeholder="Your studio name"
+                    maxlength="80" />
+                </div>
+              </div>
+
+              <div class="col-12 d-grid mt-2">
+                <button class="btn btn-primary btn-lg" type="submit">
+                  Join waitlist <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+              </div>
+
+              <div class="col-12">
+                <div id="waitlistStatus" class="muted mini mt-2"></div>
+              </div>
+            </form>
+
+            <iframe name="waitlist_iframe" style="display:none;"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SURVEY -->
+  <section id="feedback" class="section pt-0">
+    <div class="container">
+      <div class="row mb-3 align-items-end">
+        <div class="col-lg-8">
+          <h2 class="fw-bold">Survey</h2>
+          <p class="muted mb-0">
+            A short questionnaire to understand what studios want most.
+          </p>
+        </div>
+      </div>
+
+      <div class="iframe-wrap">
+        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScTESTFORMPLACEHOLDER/viewform?embedded=true" width="100%"
+          height="900" frameborder="0" marginheight="0" marginwidth="0" style="display:block;"
+          title="Survey">Loading…</iframe>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Contact / Comments -->
+  <section id="contact" class="section pt-0">
+    <div class="container">
+      <div class="row mb-3 align-items-end">
+        <div class="col-lg-8">
+          <h2 class="fw-bold">Contact & comments</h2>
+          <p class="muted mb-0">
+            If something is unclear, or you'd like to reach out, leave us a short message below.
+          </p>
+        </div>
+      </div>
+
+      <div class="glass p-4 p-md-5">
+        <form id="contactForm"
+          action="https://script.google.com/macros/s/AKfycbyUmrZfvXv3-4OhfDpqkE9BOkKVvftQ2f4GxagEYdj4j7hEky7Ro-z-uMEFDdJxGCov/exec"
+          method="POST" target="contact_iframe">
+
+          <input type="hidden" name="type" value="comments">
+          <input type="hidden" name="secret" value="change-this-to-something-long">
+
+          <div class="row g-3">
+            <div class="col-md-5">
+              <label class="form-label mini muted" for="role">You are</label>
+              <select class="form-select form-select-lg" id="role" name="role" required>
+                <option value="" selected disabled>Choose one…</option>
+                <option value="player">Player</option>
+                <option value="developer">Developer / Studio</option>
+                <option value="partner">Potential partner</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="col-md-7">
+              <label class="form-label mini muted" for="contactEmail">Email (optional)</label>
+              <input class="form-control form-control-lg" type="email" id="contactEmail" name="email"
+                placeholder="you@domain.com">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label mini muted" for="message">Message</label>
+              <textarea class="form-control form-control-lg" id="message" name="message" rows="4"
+                placeholder="Your comment, question, or message…" required></textarea>
+            </div>
+
+            <div class="col-12 d-flex flex-wrap align-items-center gap-3 mt-2">
+              <button class="btn btn-primary btn-lg px-4" type="submit">
+                Send message <i class="bi bi-send ms-2"></i>
+              </button>
+              <span id="contactStatus" class="badge-soft px-3 py-2 rounded-pill small d-none">
+                Sending…
+              </span>
+              <span class="mini muted">We read every message.</span>
+            </div>
+          </div>
+
+          <!-- Optional: simple anti-bot field (hide with CSS if you want) -->
+          <input type="text" name="company_website" tabindex="-1" autocomplete="off"
+            style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
+        </form>
+
+        <!-- Hidden iframe target to avoid redirect on submit -->
+        <iframe name="contact_iframe" id="contact_iframe" title="Contact form receiver"
+          style="width:0;height:0;border:0; position:absolute; left:-9999px;"></iframe>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <!-- FOOTER -->
+  <footer class="pb-5">
+    <div class="container">
+      <div class="divider mb-4"></div>
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-2">
+        <div class="muted mini">
+          © <span id="year"></span> In-game Trading Infrastructure. All rights reserved.
+        </div>
+        
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Footer year
+    const y = document.getElementById("year");
+    if (y) y.textContent = new Date().getFullYear();
+
+    // Waitlist UX (hidden-iframe submit)
+    const form = document.getElementById("waitlistForm");
+    const statusEl = document.getElementById("waitlistStatus");
+
+    if (form && statusEl) {
+      form.addEventListener("submit", () => {
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = 'Submitting… <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>';
+        }
+
+        statusEl.textContent = "Submitting…";
+
+        setTimeout(() => {
+          form.reset(); // CLEAR FIELDS
+          statusEl.textContent = "Thanks — you're on the waitlist.";
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = 'Join waitlist <i class="bi bi-arrow-right ms-1"></i>';
+          }
+        }, 700);
+      });
+    }
+  </script>
+
+  <script>
+    (function () {
+      const form = document.getElementById('contactForm');
+      const status = document.getElementById('contactStatus');
+      if (!form || !status) return;
+
+      form.addEventListener('submit', function () {
+        status.classList.remove('d-none');
+        status.textContent = 'Sending…';
+        // reset status after a short delay (since we submit to hidden iframe)
+        window.setTimeout(() => {
+          form.reset(); // CLEAR FIELDS
+          status.textContent = 'Sent ✓';
+          window.setTimeout(() => status.classList.add('d-none'), 2500);
+        }, 1200);
+      });
+    })();
+  </script>
+
+</body>
+
+</html>
